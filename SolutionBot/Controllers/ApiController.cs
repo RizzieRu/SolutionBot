@@ -19,7 +19,7 @@ public class ApiController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Hook([FromBody] Message? message)
+    public async Task<IActionResult> Hook([FromBody] RequestDto? request)
     {
         using (StreamReader reader = new StreamReader(HttpContext.Request.Body))
         {
@@ -27,13 +27,13 @@ public class ApiController : Controller
             Console.WriteLine($"Request Body: {body}");
         }
         
-        if (message == null)
+        if (request == null)
         {
-            Console.WriteLine("Message is null");
+            Console.WriteLine("Request is null");
             return BadRequest("Invalid request");
         }
 
-        await _hookHandlerService.HandleRequestAsync(message);
+        await _hookHandlerService.HandleRequestAsync(request.Message);
         return Ok();
     }
 }
