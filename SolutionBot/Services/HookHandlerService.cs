@@ -23,21 +23,14 @@ public class HookHandlerService : IHookHandlerService
         _solutionCommandsService = solutionCommandsService;
     }
     
-    public void HandleRequest(string json)
+    public async Task HandleRequestAsync(Message message)
     {
         _logger.LogInformation("Handling hook request");
-        _logger.LogInformation(json);
+        _logger.LogInformation(JsonSerializer.Serialize(message));
 
         try
         {
-            var jsonObject = JsonSerializer.Deserialize<Message>(json);
-            
-            if (jsonObject == null)
-                throw new Exception("Serialization error");
-            
-            _logger.LogInformation($"Successful serialization: {jsonObject}");
-
-            string[] words = jsonObject.Text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            string[] words = message.Text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
             string result;
 
@@ -49,11 +42,11 @@ public class HookHandlerService : IHookHandlerService
                     break;
                 case "посчитай":
                     _logger.LogInformation("Case: count");
-                    result = $"Число символов: {_solutionCommandsService.CountText(jsonObject).ToString()}";
+                    result = $"Число символов: {_solutionCommandsService.CountText(message).ToString()}";
                     break;
                 case "сумма":
                     _logger.LogInformation("Case: summ");
-                    result = $"Сумма: {_solutionCommandsService.SolveMath(jsonObject).ToString()}";
+                    result = $"Сумма: {_solutionCommandsService.SolveMath(message).ToString()}";
                     break;
                 default:
                     _logger.LogInformation("Case: default");
@@ -61,12 +54,13 @@ public class HookHandlerService : IHookHandlerService
                     break;
             }
             
-            _telegramService.SendTextMessageAsync(jsonObject.From.Id, result);
+            await _telegramService.SendTextMessageAsync(message.From.Id, result);
         }
         catch (Exception ex)
         {
             _logger.LogError("Handler error");
             _logger.LogError(ex.Message);
+            await _telegramService.SendTextMessageAsync(message.From.Id, "Возникла ошибка. Извините");
         }
     }
 }

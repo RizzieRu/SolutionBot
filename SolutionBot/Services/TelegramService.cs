@@ -4,7 +4,6 @@ using SolutionBot.Models.TelegramApi;
 using SolutionBot.Services.Inferfaces;
 
 namespace SolutionBot.Services;
-
 public class TelegramService : ITelegramService
 {
     private readonly string _token;
@@ -37,10 +36,13 @@ public class TelegramService : ITelegramService
             var postResult = await _httpClient.PostAsync(uri, content);
 
             postResult.EnsureSuccessStatusCode();
+            
+            _logger.LogInformation($"Successful send message with content: {message}");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
+            _logger.LogWarning($"Cannot send message with content: {message}");
         }
     }
 }

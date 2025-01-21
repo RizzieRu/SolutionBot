@@ -11,6 +11,10 @@ builder.Configuration
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHttpClient();
+
+builder.Services.AddHttpContextAccessor();
+
 // Services
 builder.Services.AddScoped<IHookHandlerService, HookHandlerService>();
 builder.Services.AddScoped<ITelegramService, TelegramService>();

@@ -8,9 +8,6 @@ public class User
     [JsonPropertyName("id")]
     public string Id { get; set; }
     
-    [JsonPropertyName("is_bot")]
-    public bool IsBot { get; set; }
-    
     [JsonPropertyName("first_name")]
     public string FirstName { get; set; }
     
