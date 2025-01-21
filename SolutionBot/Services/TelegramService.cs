@@ -21,7 +21,7 @@ public class TelegramService : ITelegramService
         _logger = logger;
     }
     
-    public async Task SendTextMessageAsync(string chatId, string message)
+    public async Task SendTextMessageAsync(int chatId, string message)
     {
         try
         {

@@ -5,12 +5,12 @@ namespace SolutionBot.Models.TelegramApi;
 public class SendMessageDto
 {
     [JsonPropertyName("chat_id")]
-    public string ChatId { get; set; }
+    public int ChatId { get; set; }
     
     [JsonPropertyName("text")]
     public string Text { get; set; }
 
-    public SendMessageDto(string chatId, string text)
+    public SendMessageDto(int chatId, string text)
     {
         ChatId = chatId;
         

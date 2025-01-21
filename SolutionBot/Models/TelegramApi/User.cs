@@ -6,7 +6,7 @@ public class User
 {
     // Not int cause user ID may have more then 10 symbols
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public int Id { get; set; }
     
     [JsonPropertyName("first_name")]
     public string FirstName { get; set; }
