@@ -1,0 +1,72 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using SolutionBot.Models.TelegramApi;
+using SolutionBot.Services.Inferfaces;
+
+namespace SolutionBot.Services;
+
+public class HookHandlerService : IHookHandlerService
+{
+    private readonly ITelegramService _telegramService;
+    
+    private readonly ISolutionCommandsService _solutionCommandsService;
+    
+    private readonly ILogger<HookHandlerService> _logger;
+    
+    public HookHandlerService(ITelegramService telegramService, ILogger<HookHandlerService> logger, ISolutionCommandsService solutionCommandsService)
+    {
+        _telegramService = telegramService;
+        
+        _logger = logger;
+        
+        _solutionCommandsService = solutionCommandsService;
+    }
+    
+    public void HandleRequest(string json)
+    {
+        _logger.LogInformation("Handling hook request");
+        _logger.LogInformation(json);
+
+        try
+        {
+            var jsonObject = JsonSerializer.Deserialize<Message>(json);
+            
+            if (jsonObject == null)
+                throw new Exception("Serialization error");
+            
+            _logger.LogInformation($"Successful serialization: {jsonObject}");
+
+            string[] words = jsonObject.Text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            string result;
+
+            switch (words[0])
+            {
+                case "/start":
+                    _logger.LogInformation("Case: /start");
+                    result = _solutionCommandsService.DefaultText();
+                    break;
+                case "посчитай":
+                    _logger.LogInformation("Case: count");
+                    result = $"Число символов: {_solutionCommandsService.CountText(jsonObject).ToString()}";
+                    break;
+                case "сумма":
+                    _logger.LogInformation("Case: summ");
+                    result = $"Сумма: {_solutionCommandsService.SolveMath(jsonObject).ToString()}";
+                    break;
+                default:
+                    _logger.LogInformation("Case: default");
+                    result = _solutionCommandsService.DefaultNoMatchText();
+                    break;
+            }
+            
+            _telegramService.SendTextMessageAsync(jsonObject.From.Id, result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Handler error");
+            _logger.LogError(ex.Message);
+        }
+    }
+}
