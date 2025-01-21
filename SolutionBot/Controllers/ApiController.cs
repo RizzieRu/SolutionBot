@@ -21,11 +21,19 @@ public class ApiController : Controller
     [HttpPost]
     public async Task<IActionResult> Hook([FromBody] Message? message)
     {
+        using (StreamReader reader = new StreamReader(HttpContext.Request.Body))
+        {
+            string body = await reader.ReadToEndAsync();
+            Console.WriteLine($"Request Body: {body}");
+        }
+        
         if (message == null)
-            throw new ArgumentNullException(nameof(message));
-        
+        {
+            Console.WriteLine("Message is null");
+            return BadRequest("Invalid request");
+        }
+
         await _hookHandlerService.HandleRequestAsync(message);
-        
         return Ok();
     }
 }
